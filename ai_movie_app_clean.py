@@ -213,6 +213,8 @@ Focus on real, popular Indian movies. Return ONLY the JSON array."""
     def _comprehensive_database_recommendations(self, query: str, num_recs: int) -> List[Dict]:
         """Use comprehensive database with 200+ movies per genre/language"""
         
+        query_lower = query.lower()
+        
         if DATABASE_AVAILABLE:
             try:
                 # Search in comprehensive database
@@ -238,26 +240,34 @@ Focus on real, popular Indian movies. Return ONLY the JSON array."""
                     return recommendations
                 
                 # Genre-based search
-                query_lower = query.lower()
                 for genre in ["Action", "Comedy", "Drama", "Romance", "Thriller"]:
                     if genre.lower() in query_lower:
                         movies = get_movies_by_genre(genre, num_recs)
-                        return self._format_database_movies(movies, query)
+                        if movies:
+                            return self._format_database_movies(movies, query)
+                
+                # Check for specific genre keywords
+                if "romance" in query_lower or "romantic" in query_lower or "love" in query_lower:
+                    return self._get_romance_movies(num_recs)
+                if "thriller" in query_lower or "suspense" in query_lower:
+                    return self._get_thriller_movies(num_recs)
                 
                 # Language-based search
                 for language in ["Hindi", "Tamil", "Telugu", "Malayalam", "Kannada"]:
                     if language.lower() in query_lower:
                         movies = get_movies_by_language(language, num_recs)
-                        return self._format_database_movies(movies, query)
+                        if movies:
+                            return self._format_database_movies(movies, query)
                 
-                # Random movies
+                # Random movies as fallback
                 movies = get_random_movies(num_recs)
-                return self._format_database_movies(movies, query)
+                if movies:
+                    return self._format_database_movies(movies, query)
                 
             except Exception as e:
-                st.error(f"Database error: {str(e)}")
+                st.warning(f"Database search failed, using basic recommendations")
         
-        # Basic fallback
+        # Always return basic fallback to ensure recommendations are shown
         return self._basic_fallback_movies(num_recs)
     
     def _format_database_movies(self, movies: List[Dict], query: str) -> List[Dict]:
@@ -281,15 +291,42 @@ Focus on real, popular Indian movies. Return ONLY the JSON array."""
         return formatted
     
     def _basic_fallback_movies(self, num_recs: int) -> List[Dict]:
-        """Basic fallback movies"""
+        """Basic fallback movies - always returns recommendations"""
         basic_movies = [
-            {"title": "RRR", "language": "Telugu", "year": 2022, "genres": "Action", "director": "S.S. Rajamouli", "cast": "N.T. Rama Rao Jr., Ram Charan", "rating": 8.8, "plot": "Epic action drama about two revolutionaries.", "platforms": ["Netflix"], "streaming": ["Netflix"], "why_recommended": "Blockbuster epic"},
-            {"title": "KGF Chapter 2", "language": "Kannada", "year": 2022, "genres": "Action", "director": "Prashanth Neel", "cast": "Yash, Srinidhi Shetty", "rating": 8.4, "plot": "Rocky's rise to power continues.", "platforms": ["Prime Video"], "streaming": ["Prime Video"], "why_recommended": "Action blockbuster"},
-            {"title": "3 Idiots", "language": "Hindi", "year": 2009, "genres": "Comedy", "director": "Rajkumar Hirani", "cast": "Aamir Khan, R. Madhavan", "rating": 8.4, "plot": "Comedy about engineering students.", "platforms": ["Netflix"], "streaming": ["Netflix"], "why_recommended": "Classic comedy"},
-            {"title": "Dangal", "language": "Hindi", "year": 2016, "genres": "Drama", "director": "Nitesh Tiwari", "cast": "Aamir Khan, Fatima Sana Shaikh", "rating": 8.4, "plot": "Wrestler trains his daughters.", "platforms": ["Netflix"], "streaming": ["Netflix"], "why_recommended": "Inspiring sports drama"},
-            {"title": "Vikram", "language": "Tamil", "year": 2022, "genres": "Action", "director": "Lokesh Kanagaraj", "cast": "Kamal Haasan, Vijay Sethupathi", "rating": 8.4, "plot": "Special agent investigates murders.", "platforms": ["Hotstar"], "streaming": ["Hotstar"], "why_recommended": "Thrilling action"}
+            {"title": "RRR", "language": "Telugu", "year": 2022, "genres": "Action", "director": "S.S. Rajamouli", "cast": "N.T. Rama Rao Jr., Ram Charan", "rating": 8.8, "plot": "Epic action drama about two revolutionaries and their fight against British colonial rule.", "platforms": ["Netflix"], "streaming": ["Netflix"], "why_recommended": "Blockbuster epic with stunning visuals"},
+            {"title": "KGF Chapter 2", "language": "Kannada", "year": 2022, "genres": "Action", "director": "Prashanth Neel", "cast": "Yash, Srinidhi Shetty", "rating": 8.4, "plot": "Rocky's rise to power continues as he faces new enemies and challenges.", "platforms": ["Prime Video"], "streaming": ["Prime Video"], "why_recommended": "Action-packed sequel with mass appeal"},
+            {"title": "3 Idiots", "language": "Hindi", "year": 2009, "genres": "Comedy", "director": "Rajkumar Hirani", "cast": "Aamir Khan, R. Madhavan", "rating": 8.4, "plot": "Comedy about engineering students and their journey of friendship and self-discovery.", "platforms": ["Netflix"], "streaming": ["Netflix"], "why_recommended": "Timeless comedy with heart"},
+            {"title": "Dangal", "language": "Hindi", "year": 2016, "genres": "Drama", "director": "Nitesh Tiwari", "cast": "Aamir Khan, Fatima Sana Shaikh", "rating": 8.4, "plot": "A wrestler trains his daughters to become world-class wrestlers.", "platforms": ["Netflix"], "streaming": ["Netflix"], "why_recommended": "Inspiring sports drama based on true story"},
+            {"title": "Vikram", "language": "Tamil", "year": 2022, "genres": "Action", "director": "Lokesh Kanagaraj", "cast": "Kamal Haasan, Vijay Sethupathi", "rating": 8.4, "plot": "A special agent investigates a series of murders connected to drug cartels.", "platforms": ["Hotstar"], "streaming": ["Hotstar"], "why_recommended": "Thrilling action with stellar performances"},
+            {"title": "Pushpa", "language": "Telugu", "year": 2021, "genres": "Action", "director": "Sukumar", "cast": "Allu Arjun, Rashmika Mandanna", "rating": 7.6, "plot": "A laborer rises through the ranks of a red sandalwood smuggling syndicate.", "platforms": ["Prime Video"], "streaming": ["Prime Video"], "why_recommended": "Mass entertainer with powerful performance"},
+            {"title": "Baahubali 2", "language": "Telugu", "year": 2017, "genres": "Action", "director": "S.S. Rajamouli", "cast": "Prabhas, Rana Daggubati", "rating": 8.2, "plot": "The conclusion of Baahubali's epic story and the answer to why Kattappa killed Baahubali.", "platforms": ["Hotstar"], "streaming": ["Hotstar"], "why_recommended": "Epic conclusion to the legendary saga"},
+            {"title": "Drishyam", "language": "Malayalam", "year": 2013, "genres": "Thriller", "director": "Jeethu Joseph", "cast": "Mohanlal, Meena", "rating": 8.3, "plot": "A man goes to great lengths to protect his family from a crime investigation.", "platforms": ["Hotstar"], "streaming": ["Hotstar"], "why_recommended": "Masterful thriller with brilliant storytelling"},
+            {"title": "Kantara", "language": "Kannada", "year": 2022, "genres": "Drama", "director": "Rishab Shetty", "cast": "Rishab Shetty, Sapthami Gowda", "rating": 8.2, "plot": "A Kambala champion's conflict with an upright forest officer unfolds in this folklore drama.", "platforms": ["Prime Video"], "streaming": ["Prime Video"], "why_recommended": "Cultural masterpiece with stunning visuals"},
+            {"title": "Arjun Reddy", "language": "Telugu", "year": 2017, "genres": "Drama", "director": "Sandeep Reddy Vanga", "cast": "Vijay Deverakonda, Shalini Pandey", "rating": 8.1, "plot": "A surgeon's life spirals out of control when his girlfriend marries someone else.", "platforms": ["Netflix"], "streaming": ["Netflix"], "why_recommended": "Intense romantic drama with raw emotions"}
         ]
         return basic_movies[:num_recs]
+    
+    def _get_romance_movies(self, num_recs: int) -> List[Dict]:
+        """Get romance movies"""
+        romance_movies = [
+            {"title": "Dilwale Dulhania Le Jayenge", "language": "Hindi", "year": 1995, "genres": "Romance", "director": "Aditya Chopra", "cast": "Shah Rukh Khan, Kajol", "rating": 8.1, "plot": "A young man and woman fall in love during a trip to Europe.", "platforms": ["Prime Video"], "streaming": ["Prime Video"], "why_recommended": "Timeless romantic classic"},
+            {"title": "96", "language": "Tamil", "year": 2018, "genres": "Romance", "director": "C. Prem Kumar", "cast": "Vijay Sethupathi, Trisha", "rating": 8.5, "plot": "A photographer and his high school sweetheart reconnect after 22 years.", "platforms": ["Hotstar"], "streaming": ["Hotstar"], "why_recommended": "Beautiful nostalgic love story"},
+            {"title": "Geetha Govindam", "language": "Telugu", "year": 2018, "genres": "Romance", "director": "Parasuram", "cast": "Vijay Deverakonda, Rashmika Mandanna", "rating": 7.3, "plot": "A young lecturer falls for a girl but faces misunderstandings.", "platforms": ["Prime Video"], "streaming": ["Prime Video"], "why_recommended": "Sweet romantic comedy"},
+            {"title": "Premam", "language": "Malayalam", "year": 2015, "genres": "Romance", "director": "Alphonse Puthren", "cast": "Nivin Pauly, Sai Pallavi", "rating": 8.3, "plot": "Three stages of love in a young man's life.", "platforms": ["Hotstar"], "streaming": ["Hotstar"], "why_recommended": "Heartwarming tale of love"},
+            {"title": "Mungaru Male", "language": "Kannada", "year": 2006, "genres": "Romance", "director": "Yogaraj Bhat", "cast": "Ganesh, Pooja Gandhi", "rating": 8.2, "plot": "A young man falls in love during a train journey.", "platforms": ["Zee5"], "streaming": ["Zee5"], "why_recommended": "Kannada romantic blockbuster"}
+        ]
+        return romance_movies[:num_recs]
+    
+    def _get_thriller_movies(self, num_recs: int) -> List[Dict]:
+        """Get thriller movies"""
+        thriller_movies = [
+            {"title": "Andhadhun", "language": "Hindi", "year": 2018, "genres": "Thriller", "director": "Sriram Raghavan", "cast": "Ayushmann Khurrana, Tabu", "rating": 8.2, "plot": "A blind pianist gets embroiled in a murder mystery.", "platforms": ["Netflix"], "streaming": ["Netflix"], "why_recommended": "Mind-bending thriller with twists"},
+            {"title": "Ratsasan", "language": "Tamil", "year": 2018, "genres": "Thriller", "director": "Ram Kumar", "cast": "Vishnu Vishal, Amala Paul", "rating": 8.3, "plot": "A cop hunts a serial killer targeting school girls.", "platforms": ["Hotstar"], "streaming": ["Hotstar"], "why_recommended": "Gripping psychological thriller"},
+            {"title": "Evaru", "language": "Telugu", "year": 2019, "genres": "Thriller", "director": "Venkat Ramji", "cast": "Adivi Sesh, Regina Cassandra", "rating": 7.8, "plot": "A corrupt cop investigates a rape case with shocking twists.", "platforms": ["Prime Video"], "streaming": ["Prime Video"], "why_recommended": "Intelligent crime thriller"},
+            {"title": "Drishyam", "language": "Malayalam", "year": 2013, "genres": "Thriller", "director": "Jeethu Joseph", "cast": "Mohanlal, Meena", "rating": 8.3, "plot": "A man protects his family from a murder investigation.", "platforms": ["Hotstar"], "streaming": ["Hotstar"], "why_recommended": "Masterful family thriller"},
+            {"title": "U Turn", "language": "Kannada", "year": 2016, "genres": "Thriller", "director": "Pawan Kumar", "cast": "Shraddha Srinath, Roger Narayan", "rating": 7.4, "plot": "A journalist investigates accidents at a flyover.", "platforms": ["Prime Video"], "streaming": ["Prime Video"], "why_recommended": "Supernatural thriller with social message"}
+        ]
+        return thriller_movies[:num_recs]
 
 def get_platform_url(platform: str, movie_title: str) -> str:
     """Get direct URL to streaming platform"""
