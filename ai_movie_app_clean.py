@@ -355,9 +355,29 @@ def get_movie_poster_url(movie_title: str, year: int) -> str:
     
     # First check comprehensive poster database
     if POSTERS_AVAILABLE:
-        poster_url = get_poster_url(movie_title)
-        if poster_url:
-            return poster_url
+        try:
+            poster_url = get_poster_url(movie_title)
+            if poster_url:
+                return poster_url
+        except Exception as e:
+            print(f"Poster database error for {movie_title}: {e}")
+    
+    # Hardcoded popular movie posters as backup
+    popular_posters = {
+        "RRR": "https://m.media-amazon.com/images/M/MV5BODUwNDNjYzctODUxNy00ZTA2LWIyYTEtMDc5Y2E5ZjBmNTMzXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_SX300.jpg",
+        "KGF Chapter 2": "https://m.media-amazon.com/images/M/MV5BZWNiOTc4NGItNGY4NC00ZTdkLTlkOTEtNDE2YzZiNGRkNTFhXkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_SX300.jpg",
+        "3 Idiots": "https://m.media-amazon.com/images/M/MV5BNTkyOGVjMGEtNmQzZi00NzFlLTlhOWQtODYyMDc2ZGJmYzFhXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg",
+        "Dangal": "https://m.media-amazon.com/images/M/MV5BMTQ4MzQzMzM2Nl5BMl5BanBnXkFtZTgwMTQ1NzU3MDI@._V1_SX300.jpg",
+        "Vikram": "https://m.media-amazon.com/images/M/MV5BYjFjMTQzY2EtZjQ5MC00NGUyLWJiYWMtZDI3MTQ1MGU4OGY2XkEyXkFqcGdeQXVyNDExMjcyMzA@._V1_SX300.jpg",
+        "Pushpa": "https://m.media-amazon.com/images/M/MV5BNGZlNTFlOWMtMzUwNC00ZDdhLWI4Y2UtYTY2ZDhmMGQ0OTc1XkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_SX300.jpg",
+        "Baahubali 2": "https://m.media-amazon.com/images/M/MV5BYTMxMGY2ZjQtYjdmOS00NzlkLWJiMjItZGM0MWY3MmQ1NjM2XkEyXkFqcGdeQXVyMzc5Mjk3OA@@._V1_SX300.jpg",
+        "Drishyam": "https://m.media-amazon.com/images/M/MV5BYjY2NGNmYjQtZjg5MC00NGVmLWJkZTgtMzQ3YzgyNTY2YTVkXkEyXkFqcGdeQXVyMjkxNzQ1NDI@._V1_SX300.jpg",
+        "Kantara": "https://m.media-amazon.com/images/M/MV5BM2Q3MWEwM2EtNzQwZC00YzE0LWJlYWYtMjk1ZjNlYWQ3ZTQyXkEyXkFqcGdeQXVyMTUzNTgzNzM0._V1_SX300.jpg",
+        "Arjun Reddy": "https://m.media-amazon.com/images/M/MV5BNzIwMzk1MjEtZGUxZi00YTMwLWFiYWMtZDI2Yjk0NzlmMmE2XkEyXkFqcGdeQXVyMzgxODM4NjM@._V1_SX300.jpg"
+    }
+    
+    if movie_title in popular_posters:
+        return popular_posters[movie_title]
     
     # Then try OMDB API
     try:
@@ -370,8 +390,8 @@ def get_movie_poster_url(movie_title: str, year: int) -> str:
     except:
         pass
     
-    # Fallback to a styled placeholder
-    return f"https://via.placeholder.com/300x450/667eea/ffffff?text={movie_title.replace(' ', '%20')}"
+    # Return None for gradient card fallback
+    return None
 
 def display_movie_card(movie: Dict):
     """Display a movie recommendation card with poster and clickable platform links"""
@@ -392,19 +412,35 @@ def display_movie_card(movie: Dict):
     col1, col2 = st.columns([1, 2])
     
     with col1:
-        # Display movie poster
-        try:
-            st.image(poster_url, width=200, caption=f"{movie['title']} ({movie['year']})")
-        except:
-            # Fallback if image fails to load
+        # Display movie poster or gradient card
+        if poster_url:
+            try:
+                st.image(poster_url, width=200, caption=f"{movie['title']} ({movie['year']})")
+            except Exception as e:
+                # Show gradient card if image fails to load
+                st.markdown(f"""
+                <div style="text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                            color: white; padding: 1.5rem; border-radius: 15px; height: 280px; width: 200px;
+                            display: flex; align-items: center; justify-content: center; margin: 0 auto;
+                            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🎬</div>
+                        <h4 style="margin: 0.5rem 0; font-size: 1.1rem;">{movie['title']}</h4>
+                        <p style="margin: 0; opacity: 0.8;">({movie['year']})</p>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            # Show gradient card for movies without posters
             st.markdown(f"""
             <div style="text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                        color: white; padding: 2rem; border-radius: 10px; height: 300px; 
-                        display: flex; align-items: center; justify-content: center;">
-                <div>
-                    <h3>🎬</h3>
-                    <p>{movie['title']}</p>
-                    <p>({movie['year']})</p>
+                        color: white; padding: 1.5rem; border-radius: 15px; height: 280px; width: 200px;
+                        display: flex; align-items: center; justify-content: center; margin: 0 auto;
+                        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);">
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🎬</div>
+                    <h4 style="margin: 0.5rem 0; font-size: 1.1rem;">{movie['title']}</h4>
+                    <p style="margin: 0; opacity: 0.8;">({movie['year']})</p>
                 </div>
             </div>
             """, unsafe_allow_html=True)
