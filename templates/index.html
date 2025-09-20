@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 Indian Movie Recommender - Discover Your Next Favorite Film</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">🎬 Indian Movie Recommender</h1>
+            <p class="tagline">Discover your next favorite film from Bollywood and regional cinema</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Search Section -->
+            <section class="search-section">
+                <div class="search-container">
+                    <div class="search-box">
+                        <input 
+                            type="text" 
+                            id="movieInput" 
+                            placeholder="Enter a movie title (e.g., Dangal, Baahubali, 3 Idiots, कांतारा)"
+                            autocomplete="off"
+                        >
+                        <div id="autocompleteDropdown" class="autocomplete-dropdown"></div>
+                    </div>
+                    <button id="searchBtn" class="search-btn">
+                        <span class="btn-text">Get Recommendations</span>
+                        <span class="btn-loading">🔄 Searching...</span>
+                    </button>
+                </div>
+                
+                <!-- Advanced Filters -->
+                <div class="filters-section">
+                    <button id="toggleFilters" class="toggle-filters-btn">
+                        🔧 Advanced Filters
+                    </button>
+                    <div id="filtersContainer" class="filters-container hidden">
+                        <div class="filter-group">
+                            <label for="languageFilter">Language:</label>
+                            <select id="languageFilter">
+                                <option value="">All Languages</option>
+                                <option value="Hindi">Hindi</option>
+                                <option value="Tamil">Tamil</option>
+                                <option value="Telugu">Telugu</option>
+                                <option value="Kannada">Kannada</option>
+                                <option value="Malayalam">Malayalam</option>
+                                <option value="Bengali">Bengali</option>
+                                <option value="Marathi">Marathi</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="genreFilter">Genre:</label>
+                            <select id="genreFilter">
+                                <option value="">All Genres</option>
+                                <option value="Action">Action</option>
+                                <option value="Comedy">Comedy</option>
+                                <option value="Drama">Drama</option>
+                                <option value="Romance">Romance</option>
+                                <option value="Thriller">Thriller</option>
+                                <option value="Crime">Crime</option>
+                                <option value="Biography">Biography</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="ratingFilter">Min Rating:</label>
+                            <select id="ratingFilter">
+                                <option value="">Any Rating</option>
+                                <option value="7.0">7.0+</option>
+                                <option value="7.5">7.5+</option>
+                                <option value="8.0">8.0+</option>
+                                <option value="8.5">8.5+</option>
+                            </select>
+                        </div>
+                        <button id="applyFilters" class="apply-filters-btn">Apply Filters</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Loading Section -->
+            <section id="loadingSection" class="loading-section hidden">
+                <div class="loading-spinner"></div>
+                <p>Finding perfect movie recommendations for you...</p>
+            </section>
+
+            <!-- Error Section -->
+            <section id="errorSection" class="error-section hidden">
+                <div class="error-message">
+                    <h3>🚫 Oops! Something went wrong</h3>
+                    <p id="errorText"></p>
+                    <button id="retryBtn" class="retry-btn">Try Again</button>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="results-section hidden">
+                <div class="results-header">
+                    <h2 id="resultsTitle">🎯 Recommendations for "<span id="inputMovieTitle"></span>"</h2>
+                    <p id="resultsSubtitle">Based on genres, cast, director, and themes</p>
+                </div>
+                <div id="movieGrid" class="movie-grid">
+                    <!-- Movie cards will be dynamically inserted here -->
+                </div>
+            </section>
+
+            <!-- Dataset Stats Section -->
+            <section class="stats-section">
+                <div class="stats-container">
+                    <h3>📊 Our Movie Database</h3>
+                    <div id="statsGrid" class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalMovies">-</div>
+                            <div class="stat-label">Total Movies</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalLanguages">-</div>
+                            <div class="stat-label">Languages</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="avgRating">-</div>
+                            <div class="stat-label">Avg Rating</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="yearRange">-</div>
+                            <div class="stat-label">Year Range</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Indian Movie Recommender. Powered by TF-IDF & Cosine Similarity | Data from OMDb API</p>
+            <div class="footer-links">
+                <a href="#" onclick="showAbout()">About</a>
+                <a href="#" onclick="showHelp()">Help</a>
+                <a href="#" onclick="showContact()">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal for About/Help/Contact -->
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
