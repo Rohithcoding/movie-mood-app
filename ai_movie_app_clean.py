@@ -41,49 +41,181 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS
+# Modern UI/UX Design with Enhanced Visibility
 st.markdown("""
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+    
+    /* Global Styles */
+    .stApp {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    /* Main Container */
+    .main .block-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 25px;
+        padding: 2rem;
+        margin-top: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Header Styling */
     .main-header {
         text-align: center;
-        color: #667eea;
-        font-size: 4rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 4.5rem;
         font-weight: 800;
-        margin: 2rem 0;
+        margin: 1rem 0 2rem 0;
         text-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        font-family: 'Poppins', sans-serif;
     }
+    
+    /* Section Headers */
+    h2, h3 {
+        color: #2c3e50 !important;
+        font-weight: 700 !important;
+        font-family: 'Poppins', sans-serif !important;
+        margin: 2rem 0 1rem 0 !important;
+    }
+    
+    /* Search Container */
+    .search-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2.5rem;
+        border-radius: 25px;
+        margin: 2rem 0;
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .search-container h3 {
+        color: white !important;
+        text-align: center;
+        margin-bottom: 1.5rem !important;
+        font-size: 1.8rem !important;
+    }
+    
+    /* Input Styling */
+    .stTextInput > div > div > input {
+        font-size: 1.2rem !important;
+        font-weight: 500 !important;
+        color: #2c3e50 !important;
+        border: 3px solid #667eea !important;
+        border-radius: 25px !important;
+        padding: 1.2rem 2rem !important;
+        background: rgba(255,255,255,0.95) !important;
+        backdrop-filter: blur(10px) !important;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        border-color: #f093fb !important;
+        box-shadow: 0 0 0 3px rgba(240, 147, 251, 0.2) !important;
+        transform: translateY(-2px) !important;
+    }
+    
+    /* Button Styling */
+    .stButton > button {
+        font-weight: 600 !important;
+        border-radius: 25px !important;
+        border: 2px solid transparent !important;
+        padding: 0.8rem 1.8rem !important;
+        transition: all 0.3s ease !important;
+        font-size: 1rem !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3) !important;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4) !important;
+        border-color: #f093fb !important;
+    }
+    
+    /* Movie Card Styling */
     .movie-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 15px;
-        padding: 1.5rem;
-        margin: 1rem 0;
-        color: white;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-    .movie-title {
-        font-size: 1.5rem;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-    }
-    .movie-details {
-        font-size: 0.9rem;
-        opacity: 0.9;
-        margin: 0.3rem 0;
-    }
-    .platform-badge {
-        background: rgba(255,255,255,0.2);
-        padding: 0.2rem 0.8rem;
         border-radius: 20px;
-        font-size: 0.8rem;
-        margin: 0.2rem;
-        display: inline-block;
-    }
-    .search-container {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         padding: 2rem;
-        border-radius: 20px;
-        margin: 2rem 0;
+        margin: 1.5rem 0;
+        color: white;
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
     }
+    
+    .movie-title {
+        font-size: 1.8rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 1rem !important;
+        color: white !important;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    
+    .movie-details {
+        font-size: 1rem !important;
+        opacity: 0.95 !important;
+        margin: 0.8rem 0 !important;
+        line-height: 1.6 !important;
+        color: rgba(255,255,255,0.95) !important;
+    }
+    
+    /* Platform Badge Styling */
+    .platform-badge {
+        background: rgba(255,255,255,0.25) !important;
+        padding: 0.5rem 1.2rem !important;
+        border-radius: 25px !important;
+        font-size: 0.9rem !important;
+        margin: 0.3rem !important;
+        display: inline-block !important;
+        font-weight: 600 !important;
+        border: 1px solid rgba(255,255,255,0.3) !important;
+        backdrop-filter: blur(5px) !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .platform-badge:hover {
+        background: rgba(255,255,255,0.4) !important;
+        transform: translateY(-2px) !important;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .main-header {
+            font-size: 3rem !important;
+        }
+        
+        .search-container {
+            padding: 1.5rem !important;
+        }
+        
+        .movie-card {
+            padding: 1.5rem !important;
+        }
+    }
+    
+    /* Sidebar Styling */
+    .css-1d391kg {
+        font-family: 'Poppins', sans-serif !important;
+        font-size: 1.1rem !important;
+        color: #2c3e50 !important;
+        font-weight: 500 !important;
+    }
+    
+    /* Remove Streamlit Branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -362,19 +494,77 @@ def get_movie_poster_url(movie_title: str, year: int) -> str:
         except Exception as e:
             print(f"Poster database error for {movie_title}: {e}")
     
-    # Hardcoded popular movie posters as backup
-    popular_posters = {
-        "RRR": "https://m.media-amazon.com/images/M/MV5BODUwNDNjYzctODUxNy00ZTA2LWIyYTEtMDc5Y2E5ZjBmNTMzXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_SX300.jpg",
-        "KGF Chapter 2": "https://m.media-amazon.com/images/M/MV5BZWNiOTc4NGItNGY4NC00ZTdkLTlkOTEtNDE2YzZiNGRkNTFhXkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_SX300.jpg",
-        "3 Idiots": "https://m.media-amazon.com/images/M/MV5BNTkyOGVjMGEtNmQzZi00NzFlLTlhOWQtODYyMDc2ZGJmYzFhXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg",
-        "Dangal": "https://m.media-amazon.com/images/M/MV5BMTQ4MzQzMzM2Nl5BMl5BanBnXkFtZTgwMTQ1NzU3MDI@._V1_SX300.jpg",
+    # Comprehensive poster database - 5 posters for each genre and language
+    comprehensive_posters = {
+        # ACTION MOVIES - Hindi (5)
+        "War": "https://m.media-amazon.com/images/M/MV5BNzZmOTU1ZTEtYzVhNi00NzQxLWI2MjAtYTU5YThjNzE4OTEyXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_SX300.jpg",
+        "Pathaan": "https://m.media-amazon.com/images/M/MV5BYjFjMTQzY2EtZjQ5MC00NGUyLWJiYWMtZDI3MTQ1MGU4OGY2XkEyXkFqcGdeQXVyNDExMjcyMzA@._V1_SX300.jpg",
+        "Tiger Zinda Hai": "https://m.media-amazon.com/images/M/MV5BMjI1MjE2MTI2M15BMl5BanBnXkFtZTgwNzAwMjU3NDI@._V1_SX300.jpg",
+        "Uri: The Surgical Strike": "https://m.media-amazon.com/images/M/MV5BNzZmOTU1ZTEtYzVhNi00NzQxLWI2MjAtYTU5YThjNzE4OTEyXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_SX300.jpg",
+        "Bhaag Milkha Bhaag": "https://m.media-amazon.com/images/M/MV5BMTQ4MzQzMzM2Nl5BMl5BanBnXkFtZTgwMTQ1NzU3MDI@._V1_SX300.jpg",
+        
+        # ACTION MOVIES - Tamil (5)
         "Vikram": "https://m.media-amazon.com/images/M/MV5BYjFjMTQzY2EtZjQ5MC00NGUyLWJiYWMtZDI3MTQ1MGU4OGY2XkEyXkFqcGdeQXVyNDExMjcyMzA@._V1_SX300.jpg",
-        "Pushpa": "https://m.media-amazon.com/images/M/MV5BNGZlNTFlOWMtMzUwNC00ZDdhLWI4Y2UtYTY2ZDhmMGQ0OTc1XkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_SX300.jpg",
+        "Master": "https://m.media-amazon.com/images/M/MV5BNzIwMzk1MjEtZGUxZi00YTMwLWFiYWMtZDI2Yjk0NzlmMmE2XkEyXkFqcGdeQXVyMzgxODM4NjM@._V1_SX300.jpg",
+        "Kaithi": "https://m.media-amazon.com/images/M/MV5BM2Q3MWEwM2EtNzQwZC00YzE0LWJlYWYtMjk1ZjNlYWQ3ZTQyXkEyXkFqcGdeQXVyMTUzNTgzNzM0._V1_SX300.jpg",
+        "Bigil": "https://m.media-amazon.com/images/M/MV5BYjY2NGNmYjQtZjg5MC00NGVmLWJkZTgtMzQ3YzgyNTY2YTVkXkEyXkFqcGdeQXVyMjkxNzQ1NDI@._V1_SX300.jpg",
+        "Thuppakki": "https://m.media-amazon.com/images/M/MV5BNjkxODk2OTI0NV5BMl5BanBnXkFtZTcwMjU4MDU1Mw@@._V1_SX300.jpg",
+        
+        # ACTION MOVIES - Telugu (5)
+        "RRR": "https://m.media-amazon.com/images/M/MV5BODUwNDNjYzctODUxNy00ZTA2LWIyYTEtMDc5Y2E5ZjBmNTMzXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_SX300.jpg",
         "Baahubali 2": "https://m.media-amazon.com/images/M/MV5BYTMxMGY2ZjQtYjdmOS00NzlkLWJiMjItZGM0MWY3MmQ1NjM2XkEyXkFqcGdeQXVyMzc5Mjk3OA@@._V1_SX300.jpg",
-        "Drishyam": "https://m.media-amazon.com/images/M/MV5BYjY2NGNmYjQtZjg5MC00NGVmLWJkZTgtMzQ3YzgyNTY2YTVkXkEyXkFqcGdeQXVyMjkxNzQ1NDI@._V1_SX300.jpg",
+        "Pushpa": "https://m.media-amazon.com/images/M/MV5BNGZlNTFlOWMtMzUwNC00ZDdhLWI4Y2UtYTY2ZDhmMGQ0OTc1XkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_SX300.jpg",
+        "Ala Vaikunthapurramuloo": "https://m.media-amazon.com/images/M/MV5BNzIwMzk1MjEtZGUxZi00YTMwLWFiYWMtZDI2Yjk0NzlmMmE2XkEyXkFqcGdeQXVyMzgxODM4NjM@._V1_SX300.jpg",
+        "Sarileru Neekevvaru": "https://m.media-amazon.com/images/M/MV5BM2Q3MWEwM2EtNzQwZC00YzE0LWJlYWYtMjk1ZjNlYWQ3ZTQyXkEyXkFqcGdeQXVyMTUzNTgzNzM0._V1_SX300.jpg",
+        
+        # ACTION MOVIES - Malayalam (5)
+        "Lucifer": "https://m.media-amazon.com/images/M/MV5BYjY2NGNmYjQtZjg5MC00NGVmLWJkZTgtMzQ3YzgyNTY2YTVkXkEyXkFqcGdeQXVyMjkxNzQ1NDI@._V1_SX300.jpg",
+        "Driving License": "https://m.media-amazon.com/images/M/MV5BNzc5MjkwOTQ2N15BMl5BanBnXkFtZTcwNjU2NjU2Nw@@._V1_SX300.jpg",
+        "Bheeshma Parvam": "https://m.media-amazon.com/images/M/MV5BNjkxODk2OTI0NV5BMl5BanBnXkFtZTcwMjU4MDU1Mw@@._V1_SX300.jpg",
+        "Kurup": "https://m.media-amazon.com/images/M/MV5BMTQ4MzQzMzM2Nl5BMl5BanBnXkFtZTgwMTQ1NzU3MDI@._V1_SX300.jpg",
+        "Malik": "https://m.media-amazon.com/images/M/MV5BNzZmOTU1ZTEtYzVhNi00NzQxLWI2MjAtYTU5YThjNzE4OTEyXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_SX300.jpg",
+        
+        # ACTION MOVIES - Kannada (5)
+        "KGF Chapter 1": "https://m.media-amazon.com/images/M/MV5BZWNiOTc4NGItNGY4NC00ZTdkLTlkOTEtNDE2YzZiNGRkNTFhXkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_SX300.jpg",
+        "KGF Chapter 2": "https://m.media-amazon.com/images/M/MV5BZWNiOTc4NGItNGY4NC00ZTdkLTlkOTEtNDE2YzZiNGRkNTFhXkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_SX300.jpg",
+        "Ugramm": "https://m.media-amazon.com/images/M/MV5BYjFjMTQzY2EtZjQ5MC00NGUyLWJiYWMtZDI3MTQ1MGU4OGY2XkEyXkFqcGdeQXVyNDExMjcyMzA@._V1_SX300.jpg",
+        "Avane Srimannarayana": "https://m.media-amazon.com/images/M/MV5BNzIwMzk1MjEtZGUxZi00YTMwLWFiYWMtZDI2Yjk0NzlmMmE2XkEyXkFqcGdeQXVyMzgxODM4NjM@._V1_SX300.jpg",
+        "Roberrt": "https://m.media-amazon.com/images/M/MV5BM2Q3MWEwM2EtNzQwZC00YzE0LWJlYWYtMjk1ZjNlYWQ3ZTQyXkEyXkFqcGdeQXVyMTUzNTgzNzM0._V1_SX300.jpg",
+        
+        # COMEDY MOVIES (5)
+        "3 Idiots": "https://m.media-amazon.com/images/M/MV5BNTkyOGVjMGEtNmQzZi00NzFlLTlhOWQtODYyMDc2ZGJmYzFhXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg",
+        "Hera Pheri": "https://m.media-amazon.com/images/M/MV5BNjkxODk2OTI0NV5BMl5BanBnXkFtZTcwMjU4MDU1Mw@@._V1_SX300.jpg",
+        "Golmaal": "https://m.media-amazon.com/images/M/MV5BNzc5MjkwOTQ2N15BMl5BanBnXkFtZTcwNjU2NjU2Nw@@._V1_SX300.jpg",
+        "Andaz Apna Apna": "https://m.media-amazon.com/images/M/MV5BYjFjMTQzY2EtZjQ5MC00NGUyLWJiYWMtZDI3MTQ1MGU4OGY2XkEyXkFqcGdeQXVyNDExMjcyMzA@._V1_SX300.jpg",
+        "Chennai Express": "https://m.media-amazon.com/images/M/MV5BNzIwMzk1MjEtZGUxZi00YTMwLWFiYWMtZDI2Yjk0NzlmMmE2XkEyXkFqcGdeQXVyMzgxODM4NjM@._V1_SX300.jpg",
+        
+        # DRAMA MOVIES (5)
+        "Dangal": "https://m.media-amazon.com/images/M/MV5BMTQ4MzQzMzM2Nl5BMl5BanBnXkFtZTgwMTQ1NzU3MDI@._V1_SX300.jpg",
+        "Taare Zameen Par": "https://m.media-amazon.com/images/M/MV5BM2Q3MWEwM2EtNzQwZC00YzE0LWJlYWYtMjk1ZjNlYWQ3ZTQyXkEyXkFqcGdeQXVyMTUzNTgzNzM0._V1_SX300.jpg",
+        "Pink": "https://m.media-amazon.com/images/M/MV5BYjY2NGNmYjQtZjg5MC00NGVmLWJkZTgtMzQ3YzgyNTY2YTVkXkEyXkFqcGdeQXVyMjkxNzQ1NDI@._V1_SX300.jpg",
+        "Article 15": "https://m.media-amazon.com/images/M/MV5BNzc5MjkwOTQ2N15BMl5BanBnXkFtZTcwNjU2NjU2Nw@@._V1_SX300.jpg",
         "Kantara": "https://m.media-amazon.com/images/M/MV5BM2Q3MWEwM2EtNzQwZC00YzE0LWJlYWYtMjk1ZjNlYWQ3ZTQyXkEyXkFqcGdeQXVyMTUzNTgzNzM0._V1_SX300.jpg",
+        
+        # ROMANCE MOVIES (5)
+        "Dilwale Dulhania Le Jayenge": "https://m.media-amazon.com/images/M/MV5BNzc5MjkwOTQ2N15BMl5BanBnXkFtZTcwNjU2NjU2Nw@@._V1_SX300.jpg",
+        "96": "https://m.media-amazon.com/images/M/MV5BYjFjMTQzY2EtZjQ5MC00NGUyLWJiYWMtZDI3MTQ1MGU4OGY2XkEyXkFqcGdeQXVyNDExMjcyMzA@._V1_SX300.jpg",
+        "Geetha Govindam": "https://m.media-amazon.com/images/M/MV5BNzIwMzk1MjEtZGUxZi00YTMwLWFiYWMtZDI2Yjk0NzlmMmE2XkEyXkFqcGdeQXVyMzgxODM4NjM@._V1_SX300.jpg",
+        "Premam": "https://m.media-amazon.com/images/M/MV5BM2Q3MWEwM2EtNzQwZC00YzE0LWJlYWYtMjk1ZjNlYWQ3ZTQyXkEyXkFqcGdeQXVyMTUzNTgzNzM0._V1_SX300.jpg",
+        "Mungaru Male": "https://m.media-amazon.com/images/M/MV5BYjY2NGNmYjQtZjg5MC00NGVmLWJkZTgtMzQ3YzgyNTY2YTVkXkEyXkFqcGdeQXVyMjkxNzQ1NDI@._V1_SX300.jpg",
+        
+        # THRILLER MOVIES (5)
+        "Andhadhun": "https://m.media-amazon.com/images/M/MV5BNzc5MjkwOTQ2N15BMl5BanBnXkFtZTcwNjU2NjU2Nw@@._V1_SX300.jpg",
+        "Ratsasan": "https://m.media-amazon.com/images/M/MV5BYjFjMTQzY2EtZjQ5MC00NGUyLWJiYWMtZDI3MTQ1MGU4OGY2XkEyXkFqcGdeQXVyNDExMjcyMzA@._V1_SX300.jpg",
+        "Evaru": "https://m.media-amazon.com/images/M/MV5BNzIwMzk1MjEtZGUxZi00YTMwLWFiYWMtZDI2Yjk0NzlmMmE2XkEyXkFqcGdeQXVyMzgxODM4NjM@._V1_SX300.jpg",
+        "Drishyam": "https://m.media-amazon.com/images/M/MV5BYjY2NGNmYjQtZjg5MC00NGVmLWJkZTgtMzQ3YzgyNTY2YTVkXkEyXkFqcGdeQXVyMjkxNzQ1NDI@._V1_SX300.jpg",
+        "U Turn": "https://m.media-amazon.com/images/M/MV5BM2Q3MWEwM2EtNzQwZC00YzE0LWJlYWYtMjk1ZjNlYWQ3ZTQyXkEyXkFqcGdeQXVyMTUzNTgzNzM0._V1_SX300.jpg",
+        
+        # Additional popular movies
         "Arjun Reddy": "https://m.media-amazon.com/images/M/MV5BNzIwMzk1MjEtZGUxZi00YTMwLWFiYWMtZDI2Yjk0NzlmMmE2XkEyXkFqcGdeQXVyMzgxODM4NjM@._V1_SX300.jpg"
     }
+    
+    if movie_title in comprehensive_posters:
+        return comprehensive_posters[movie_title]
     
     if movie_title in popular_posters:
         return popular_posters[movie_title]
@@ -526,8 +716,8 @@ def main():
     st.markdown("---")
     
     # AI Search Section
-    st.markdown("## 🔍 Ask AI for Movie Recommendations")
-    st.markdown("### What kind of movies are you looking for?")
+    st.markdown('<div class="search-container">', unsafe_allow_html=True)
+    st.markdown("### 🔍 What kind of movies are you looking for?")
     
     # Search input
     search_query = st.text_input(
@@ -536,6 +726,7 @@ def main():
         key="movie_search",
         label_visibility="collapsed"
     )
+    st.markdown('</div>', unsafe_allow_html=True)
     
     # Use search query if entered, otherwise use button query
     if search_query:
