@@ -25,6 +25,14 @@ except ImportError:
     DATABASE_AVAILABLE = False
     print("Comprehensive database not available, using basic fallback")
 
+# Import poster database
+try:
+    from movie_posters import MOVIE_POSTERS, get_poster_url
+    POSTERS_AVAILABLE = True
+except ImportError:
+    POSTERS_AVAILABLE = False
+    print("Poster database not available")
+
 # Configure Streamlit page
 st.set_page_config(
     page_title="🎬 Movie Mood",
@@ -343,9 +351,15 @@ def get_platform_url(platform: str, movie_title: str) -> str:
     return f"{base_url}{search_query}"
 
 def get_movie_poster_url(movie_title: str, year: int) -> str:
-    """Get movie poster URL with multiple fallback options"""
+    """Get movie poster URL with comprehensive database and API fallback"""
     
-    # First try OMDB API
+    # First check comprehensive poster database
+    if POSTERS_AVAILABLE:
+        poster_url = get_poster_url(movie_title)
+        if poster_url:
+            return poster_url
+    
+    # Then try OMDB API
     try:
         omdb_url = f"https://www.omdbapi.com/?t={movie_title}&y={year}&apikey=7f7c782e-0051-449b-8636-94d0a0719c05"
         response = requests.get(omdb_url, timeout=3)
@@ -355,24 +369,6 @@ def get_movie_poster_url(movie_title: str, year: int) -> str:
                 return data['Poster']
     except:
         pass
-    
-    # Predefined posters for popular movies
-    movie_posters = {
-        "RRR": "https://m.media-amazon.com/images/M/MV5BODUwNDNjYzctODUxNy00ZTA2LWIyYTEtMDc5Y2E5ZjBmNTMzXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_SX300.jpg",
-        "KGF Chapter 2": "https://m.media-amazon.com/images/M/MV5BZWNiOTc4NGItNGY4NC00ZTdkLTlkOTEtNDE2YzZiNGRkNTFhXkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_SX300.jpg",
-        "3 Idiots": "https://m.media-amazon.com/images/M/MV5BNTkyOGVjMGEtNmQzZi00NzFlLTlhOWQtODYyMDc2ZGJmYzFhXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg",
-        "Dangal": "https://m.media-amazon.com/images/M/MV5BMTQ4MzQzMzM2Nl5BMl5BanBnXkFtZTgwMTQ1NzU3MDI@._V1_SX300.jpg",
-        "Vikram": "https://m.media-amazon.com/images/M/MV5BYjFjMTQzY2EtZjQ5MC00NGUyLWJiYWMtZDI3MTQ1MGU4OGY2XkEyXkFqcGdeQXVyNDExMjcyMzA@._V1_SX300.jpg",
-        "Pushpa": "https://m.media-amazon.com/images/M/MV5BNGZlNTFlOWMtMzUwNC00ZDdhLWI4Y2UtYTY2ZDhmMGQ0OTc1XkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_SX300.jpg",
-        "Baahubali 2": "https://m.media-amazon.com/images/M/MV5BYTMxMGY2ZjQtYjdmOS00NzlkLWJiMjItZGM0MWY3MmQ1NjM2XkEyXkFqcGdeQXVyMzc5Mjk3OA@@._V1_SX300.jpg",
-        "Drishyam": "https://m.media-amazon.com/images/M/MV5BYjY2NGNmYjQtZjg5MC00NGVmLWJkZTgtMzQ3YzgyNTY2YTVkXkEyXkFqcGdeQXVyMjkxNzQ1NDI@._V1_SX300.jpg",
-        "Kantara": "https://m.media-amazon.com/images/M/MV5BM2Q3MWEwM2EtNzQwZC00YzE0LWJlYWYtMjk1ZjNlYWQ3ZTQyXkEyXkFqcGdeQXVyMTUzNTgzNzM0._V1_SX300.jpg",
-        "Arjun Reddy": "https://m.media-amazon.com/images/M/MV5BNzIwMzk1MjEtZGUxZi00YTMwLWFiYWMtZDI2Yjk0NzlmMmE2XkEyXkFqcGdeQXVyMzgxODM4NjM@._V1_SX300.jpg"
-    }
-    
-    # Check if we have a predefined poster
-    if movie_title in movie_posters:
-        return movie_posters[movie_title]
     
     # Fallback to a styled placeholder
     return f"https://via.placeholder.com/300x450/667eea/ffffff?text={movie_title.replace(' ', '%20')}"
