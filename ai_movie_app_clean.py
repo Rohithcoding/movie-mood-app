@@ -48,33 +48,29 @@ st.markdown("""
     
     /* Global Styles */
     .stApp {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        background: #f8f9fa;
         font-family: 'Poppins', sans-serif;
     }
     
     /* Main Container */
     .main .block-container {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: 25px;
+        background: white;
+        border-radius: 15px;
         padding: 2rem;
-        margin-top: 2rem;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        margin-top: 1rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e9ecef;
     }
     
     /* Header Styling */
     .main-header {
         text-align: center;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-size: 4.5rem;
-        font-weight: 800;
-        margin: 1rem 0 2rem 0;
-        text-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
-        font-family: 'Poppins', sans-serif;
+        color: #2c3e50 !important;
+        font-size: 4rem !important;
+        font-weight: 800 !important;
+        margin: 1rem 0 2rem 0 !important;
+        font-family: 'Poppins', sans-serif !important;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1) !important;
     }
     
     /* Section Headers */
@@ -87,19 +83,18 @@ st.markdown("""
     
     /* Search Container */
     .search-container {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 2.5rem;
-        border-radius: 25px;
+        background: #667eea;
+        padding: 2rem;
+        border-radius: 15px;
         margin: 2rem 0;
-        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
     }
     
     .search-container h3 {
         color: white !important;
         text-align: center;
         margin-bottom: 1.5rem !important;
-        font-size: 1.8rem !important;
+        font-size: 1.5rem !important;
     }
     
     /* Input Styling */
@@ -584,11 +579,8 @@ def get_movie_poster_url(movie_title: str, year: int) -> str:
     return None
 
 def display_movie_card(movie: Dict):
-    """Display a movie recommendation card with poster and clickable platform links"""
+    """Display a movie recommendation card without posters - details only"""
     platforms = movie.get('platforms', movie.get('streaming', ['Netflix']))
-    
-    # Get movie poster
-    poster_url = get_movie_poster_url(movie['title'], movie['year'])
     
     # Create clickable platform badges
     platform_badges = []
@@ -598,126 +590,44 @@ def display_movie_card(movie: Dict):
     
     platform_badges_html = ''.join(platform_badges)
     
-    # Create two-column layout with poster and details
-    col1, col2 = st.columns([1, 2])
-    
-    with col1:
-        # Display movie poster or gradient card
-        if poster_url:
-            try:
-                st.image(poster_url, width=200, caption=f"{movie['title']} ({movie['year']})")
-            except Exception as e:
-                # Show movie symbol poster if image fails to load
-                st.markdown(f"""
-                <div style="text-align: center; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); 
-                            color: white; padding: 0; border-radius: 15px; height: 280px; width: 200px;
-                            display: flex; flex-direction: column; justify-content: space-between; margin: 0 auto;
-                            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); border: 2px solid #333;
-                            position: relative; overflow: hidden;">
-                    
-                    <!-- Film strip pattern -->
-                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 20px; 
-                               background: repeating-linear-gradient(90deg, #333 0px, #333 10px, transparent 10px, transparent 20px);"></div>
-                    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 20px; 
-                               background: repeating-linear-gradient(90deg, #333 0px, #333 10px, transparent 10px, transparent 20px);"></div>
-                    
-                    <!-- Main content -->
-                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1rem;">
-                        <!-- Movie camera icon -->
-                        <div style="font-size: 4rem; margin-bottom: 1rem; text-shadow: 0 4px 8px rgba(0,0,0,0.5);">🎥</div>
-                        
-                        <!-- Movie title -->
-                        <h4 style="margin: 0.5rem 0; font-size: 1rem; font-weight: 600; text-align: center; 
-                                  line-height: 1.2; text-shadow: 0 2px 4px rgba(0,0,0,0.5); max-height: 3rem; overflow: hidden;">
-                            {movie['title'][:30]}{'...' if len(movie['title']) > 30 else ''}
-                        </h4>
-                        
-                        <!-- Year and language -->
-                        <div style="background: rgba(255,255,255,0.1); padding: 0.3rem 0.8rem; border-radius: 12px; 
-                                   font-size: 0.8rem; margin-top: 0.5rem; backdrop-filter: blur(5px);">
-                            {movie['year']} • {movie['language']}
-                        </div>
-                    </div>
-                    
-                    <!-- Genre badge at bottom -->
-                    <div style="background: linear-gradient(90deg, #ff6b6b, #ee5a24); padding: 0.4rem; 
-                               text-align: center; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; 
-                               letter-spacing: 1px;">
-                        {movie.get('genres', 'Movie')}
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-        else:
-            # Show movie symbol poster for movies without real posters
-            st.markdown(f"""
-            <div style="text-align: center; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); 
-                        color: white; padding: 0; border-radius: 15px; height: 280px; width: 200px;
-                        display: flex; flex-direction: column; justify-content: space-between; margin: 0 auto;
-                        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); border: 2px solid #333;
-                        position: relative; overflow: hidden;">
-                
-                <!-- Film strip pattern -->
-                <div style="position: absolute; top: 0; left: 0; right: 0; height: 20px; 
-                           background: repeating-linear-gradient(90deg, #333 0px, #333 10px, transparent 10px, transparent 20px);"></div>
-                <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 20px; 
-                           background: repeating-linear-gradient(90deg, #333 0px, #333 10px, transparent 10px, transparent 20px);"></div>
-                
-                <!-- Main content -->
-                <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1rem;">
-                    <!-- Movie camera icon -->
-                    <div style="font-size: 4rem; margin-bottom: 1rem; text-shadow: 0 4px 8px rgba(0,0,0,0.5);">🎥</div>
-                    
-                    <!-- Movie title -->
-                    <h4 style="margin: 0.5rem 0; font-size: 1rem; font-weight: 600; text-align: center; 
-                              line-height: 1.2; text-shadow: 0 2px 4px rgba(0,0,0,0.5); max-height: 3rem; overflow: hidden;">
-                        {movie['title'][:30]}{'...' if len(movie['title']) > 30 else ''}
-                    </h4>
-                    
-                    <!-- Year and language -->
-                    <div style="background: rgba(255,255,255,0.1); padding: 0.3rem 0.8rem; border-radius: 12px; 
-                               font-size: 0.8rem; margin-top: 0.5rem; backdrop-filter: blur(5px);">
-                        {movie['year']} • {movie['language']}
-                    </div>
-                </div>
-                
-                <!-- Genre badge at bottom -->
-                <div style="background: linear-gradient(90deg, #ff6b6b, #ee5a24); padding: 0.4rem; 
-                           text-align: center; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; 
-                           letter-spacing: 1px;">
-                    {movie.get('genres', 'Movie')}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-    
-    with col2:
-        # Display movie details
-        st.markdown(f"""
-        <div class="movie-card" style="margin: 0;">
-            <div class="movie-title">{movie['title']}</div>
-            <div class="movie-details">
-                <strong>{movie['language']}</strong> • {movie['year']} • ⭐ {movie['rating']}/10
-            </div>
-            <div class="movie-details">
-                <strong>Genre:</strong> {movie['genres']} | <strong>Director:</strong> {movie['director']}
-            </div>
-            <div class="movie-details">
-                <strong>Cast:</strong> {movie['cast']}
-            </div>
-            <div class="movie-details" style="margin: 1rem 0;">
-                {movie['plot']}
-            </div>
-            <div class="movie-details">
-                <strong>Why recommended:</strong> {movie.get('why_recommended', 'Great movie choice!')}
-            </div>
-            <div style="margin-top: 1rem;">
-                <strong>Watch on:</strong> {platform_badges_html}
-            </div>
+    # Display movie details in full width
+    st.markdown(f"""
+    <div class="movie-card">
+        <div class="movie-title">{movie['title']}</div>
+        <div class="movie-details">
+            <strong>{movie['language']}</strong> • {movie['year']} • ⭐ {movie['rating']}/10
         </div>
-        """, unsafe_allow_html=True)
+        <div class="movie-details">
+            <strong>Genre:</strong> {movie['genres']} | <strong>Director:</strong> {movie['director']}
+        </div>
+        <div class="movie-details">
+            <strong>Cast:</strong> {movie['cast']}
+        </div>
+        <div class="movie-details" style="margin: 1rem 0;">
+            {movie['plot']}
+        </div>
+        <div class="movie-details">
+            <strong>Why recommended:</strong> {movie.get('why_recommended', 'Great movie choice!')}
+        </div>
+        <div style="margin-top: 1rem;">
+            <strong>Watch on:</strong> {platform_badges_html}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 def main():
-    # Header
-    st.markdown('<h1 class="main-header">🎬 Movie Mood</h1>', unsafe_allow_html=True)
+    # Header - Always visible and prominent
+    st.markdown("""
+    <div style="text-align: center; margin: 2rem 0;">
+        <h1 style="color: #2c3e50; font-size: 4rem; font-weight: 800; margin: 0; 
+                   font-family: 'Poppins', sans-serif; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">
+            🎬 Movie Mood
+        </h1>
+        <p style="color: #6c757d; font-size: 1.2rem; margin-top: 0.5rem; font-family: 'Poppins', sans-serif;">
+            Your AI-Powered Movie Companion
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Initialize recommender
     recommender = MovieRecommender()
