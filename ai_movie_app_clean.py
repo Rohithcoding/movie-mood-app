@@ -342,9 +342,28 @@ def get_platform_url(platform: str, movie_title: str) -> str:
     search_query = movie_title.replace(" ", "+")
     return f"{base_url}{search_query}"
 
+def get_movie_poster_url(movie_title: str, year: int) -> str:
+    """Get movie poster URL from OMDB API or use placeholder"""
+    try:
+        # Use OMDB API to get poster
+        omdb_url = f"http://www.omdbapi.com/?t={movie_title}&y={year}&apikey=7f7c782e-0051-449b-8636-94d0a0719c05"
+        response = requests.get(omdb_url, timeout=5)
+        if response.status_code == 200:
+            data = response.json()
+            if data.get('Poster') and data['Poster'] != 'N/A':
+                return data['Poster']
+    except:
+        pass
+    
+    # Fallback to a movie poster placeholder
+    return f"https://via.placeholder.com/300x450/667eea/ffffff?text={movie_title.replace(' ', '+')}"
+
 def display_movie_card(movie: Dict):
-    """Display a movie recommendation card with clickable platform links"""
+    """Display a movie recommendation card with poster and clickable platform links"""
     platforms = movie.get('platforms', movie.get('streaming', ['Netflix']))
+    
+    # Get movie poster
+    poster_url = get_movie_poster_url(movie['title'], movie['year'])
     
     # Create clickable platform badges
     platform_badges = []
@@ -354,29 +373,45 @@ def display_movie_card(movie: Dict):
     
     platform_badges_html = ''.join(platform_badges)
     
-    st.markdown(f"""
-    <div class="movie-card">
-        <div class="movie-title">{movie['title']}</div>
-        <div class="movie-details">
-            <strong>{movie['language']}</strong> • {movie['year']} • ⭐ {movie['rating']}/10
+    # Create two-column layout with poster and details
+    col1, col2 = st.columns([1, 2])
+    
+    with col1:
+        # Display movie poster
+        st.markdown(f"""
+        <div style="text-align: center;">
+            <img src="{poster_url}" 
+                 style="width: 100%; max-width: 200px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);"
+                 alt="{movie['title']} Poster"
+                 onerror="this.src='https://via.placeholder.com/300x450/667eea/ffffff?text={movie['title'].replace(' ', '+')}'">
         </div>
-        <div class="movie-details">
-            <strong>Genre:</strong> {movie['genres']} | <strong>Director:</strong> {movie['director']}
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        # Display movie details
+        st.markdown(f"""
+        <div class="movie-card" style="margin: 0;">
+            <div class="movie-title">{movie['title']}</div>
+            <div class="movie-details">
+                <strong>{movie['language']}</strong> • {movie['year']} • ⭐ {movie['rating']}/10
+            </div>
+            <div class="movie-details">
+                <strong>Genre:</strong> {movie['genres']} | <strong>Director:</strong> {movie['director']}
+            </div>
+            <div class="movie-details">
+                <strong>Cast:</strong> {movie['cast']}
+            </div>
+            <div class="movie-details" style="margin: 1rem 0;">
+                {movie['plot']}
+            </div>
+            <div class="movie-details">
+                <strong>Why recommended:</strong> {movie.get('why_recommended', 'Great movie choice!')}
+            </div>
+            <div style="margin-top: 1rem;">
+                <strong>Watch on:</strong> {platform_badges_html}
+            </div>
         </div>
-        <div class="movie-details">
-            <strong>Cast:</strong> {movie['cast']}
-        </div>
-        <div class="movie-details" style="margin: 1rem 0;">
-            {movie['plot']}
-        </div>
-        <div class="movie-details">
-            <strong>Why recommended:</strong> {movie.get('why_recommended', 'Great movie choice!')}
-        </div>
-        <div style="margin-top: 1rem;">
-            <strong>Watch on:</strong> {platform_badges_html}
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
 def main():
     # Header
