@@ -607,30 +607,84 @@ def display_movie_card(movie: Dict):
             try:
                 st.image(poster_url, width=200, caption=f"{movie['title']} ({movie['year']})")
             except Exception as e:
-                # Show gradient card if image fails to load
+                # Show movie symbol poster if image fails to load
                 st.markdown(f"""
-                <div style="text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                            color: white; padding: 1.5rem; border-radius: 15px; height: 280px; width: 200px;
-                            display: flex; align-items: center; justify-content: center; margin: 0 auto;
-                            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);">
-                    <div style="text-align: center;">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">🎬</div>
-                        <h4 style="margin: 0.5rem 0; font-size: 1.1rem;">{movie['title']}</h4>
-                        <p style="margin: 0; opacity: 0.8;">({movie['year']})</p>
+                <div style="text-align: center; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); 
+                            color: white; padding: 0; border-radius: 15px; height: 280px; width: 200px;
+                            display: flex; flex-direction: column; justify-content: space-between; margin: 0 auto;
+                            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); border: 2px solid #333;
+                            position: relative; overflow: hidden;">
+                    
+                    <!-- Film strip pattern -->
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 20px; 
+                               background: repeating-linear-gradient(90deg, #333 0px, #333 10px, transparent 10px, transparent 20px);"></div>
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 20px; 
+                               background: repeating-linear-gradient(90deg, #333 0px, #333 10px, transparent 10px, transparent 20px);"></div>
+                    
+                    <!-- Main content -->
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1rem;">
+                        <!-- Movie camera icon -->
+                        <div style="font-size: 4rem; margin-bottom: 1rem; text-shadow: 0 4px 8px rgba(0,0,0,0.5);">🎥</div>
+                        
+                        <!-- Movie title -->
+                        <h4 style="margin: 0.5rem 0; font-size: 1rem; font-weight: 600; text-align: center; 
+                                  line-height: 1.2; text-shadow: 0 2px 4px rgba(0,0,0,0.5); max-height: 3rem; overflow: hidden;">
+                            {movie['title'][:30]}{'...' if len(movie['title']) > 30 else ''}
+                        </h4>
+                        
+                        <!-- Year and language -->
+                        <div style="background: rgba(255,255,255,0.1); padding: 0.3rem 0.8rem; border-radius: 12px; 
+                                   font-size: 0.8rem; margin-top: 0.5rem; backdrop-filter: blur(5px);">
+                            {movie['year']} • {movie['language']}
+                        </div>
+                    </div>
+                    
+                    <!-- Genre badge at bottom -->
+                    <div style="background: linear-gradient(90deg, #ff6b6b, #ee5a24); padding: 0.4rem; 
+                               text-align: center; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; 
+                               letter-spacing: 1px;">
+                        {movie.get('genres', 'Movie')}
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
         else:
-            # Show gradient card for movies without posters
+            # Show movie symbol poster for movies without real posters
             st.markdown(f"""
-            <div style="text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                        color: white; padding: 1.5rem; border-radius: 15px; height: 280px; width: 200px;
-                        display: flex; align-items: center; justify-content: center; margin: 0 auto;
-                        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);">
-                <div style="text-align: center;">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">🎬</div>
-                    <h4 style="margin: 0.5rem 0; font-size: 1.1rem;">{movie['title']}</h4>
-                    <p style="margin: 0; opacity: 0.8;">({movie['year']})</p>
+            <div style="text-align: center; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); 
+                        color: white; padding: 0; border-radius: 15px; height: 280px; width: 200px;
+                        display: flex; flex-direction: column; justify-content: space-between; margin: 0 auto;
+                        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); border: 2px solid #333;
+                        position: relative; overflow: hidden;">
+                
+                <!-- Film strip pattern -->
+                <div style="position: absolute; top: 0; left: 0; right: 0; height: 20px; 
+                           background: repeating-linear-gradient(90deg, #333 0px, #333 10px, transparent 10px, transparent 20px);"></div>
+                <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 20px; 
+                           background: repeating-linear-gradient(90deg, #333 0px, #333 10px, transparent 10px, transparent 20px);"></div>
+                
+                <!-- Main content -->
+                <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1rem;">
+                    <!-- Movie camera icon -->
+                    <div style="font-size: 4rem; margin-bottom: 1rem; text-shadow: 0 4px 8px rgba(0,0,0,0.5);">🎥</div>
+                    
+                    <!-- Movie title -->
+                    <h4 style="margin: 0.5rem 0; font-size: 1rem; font-weight: 600; text-align: center; 
+                              line-height: 1.2; text-shadow: 0 2px 4px rgba(0,0,0,0.5); max-height: 3rem; overflow: hidden;">
+                        {movie['title'][:30]}{'...' if len(movie['title']) > 30 else ''}
+                    </h4>
+                    
+                    <!-- Year and language -->
+                    <div style="background: rgba(255,255,255,0.1); padding: 0.3rem 0.8rem; border-radius: 12px; 
+                               font-size: 0.8rem; margin-top: 0.5rem; backdrop-filter: blur(5px);">
+                        {movie['year']} • {movie['language']}
+                    </div>
+                </div>
+                
+                <!-- Genre badge at bottom -->
+                <div style="background: linear-gradient(90deg, #ff6b6b, #ee5a24); padding: 0.4rem; 
+                           text-align: center; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; 
+                           letter-spacing: 1px;">
+                    {movie.get('genres', 'Movie')}
                 </div>
             </div>
             """, unsafe_allow_html=True)
