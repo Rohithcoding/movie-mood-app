@@ -399,7 +399,6 @@ def main():
     st.markdown("""
     <div style="text-align: center; color: #666; margin: 2rem 0;">
         <p>🎬 Movie Mood - Your AI-Powered Movie Companion</p>
-        <p>Featuring comprehensive database with 200+ movies per genre and language</p>
     </div>
     """, unsafe_allow_html=True)
 
