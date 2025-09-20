@@ -343,11 +343,12 @@ def get_platform_url(platform: str, movie_title: str) -> str:
     return f"{base_url}{search_query}"
 
 def get_movie_poster_url(movie_title: str, year: int) -> str:
-    """Get movie poster URL from OMDB API or use placeholder"""
+    """Get movie poster URL with multiple fallback options"""
+    
+    # First try OMDB API
     try:
-        # Use OMDB API to get poster
-        omdb_url = f"http://www.omdbapi.com/?t={movie_title}&y={year}&apikey=7f7c782e-0051-449b-8636-94d0a0719c05"
-        response = requests.get(omdb_url, timeout=5)
+        omdb_url = f"https://www.omdbapi.com/?t={movie_title}&y={year}&apikey=7f7c782e-0051-449b-8636-94d0a0719c05"
+        response = requests.get(omdb_url, timeout=3)
         if response.status_code == 200:
             data = response.json()
             if data.get('Poster') and data['Poster'] != 'N/A':
@@ -355,8 +356,26 @@ def get_movie_poster_url(movie_title: str, year: int) -> str:
     except:
         pass
     
-    # Fallback to a movie poster placeholder
-    return f"https://via.placeholder.com/300x450/667eea/ffffff?text={movie_title.replace(' ', '+')}"
+    # Predefined posters for popular movies
+    movie_posters = {
+        "RRR": "https://m.media-amazon.com/images/M/MV5BODUwNDNjYzctODUxNy00ZTA2LWIyYTEtMDc5Y2E5ZjBmNTMzXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_SX300.jpg",
+        "KGF Chapter 2": "https://m.media-amazon.com/images/M/MV5BZWNiOTc4NGItNGY4NC00ZTdkLTlkOTEtNDE2YzZiNGRkNTFhXkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_SX300.jpg",
+        "3 Idiots": "https://m.media-amazon.com/images/M/MV5BNTkyOGVjMGEtNmQzZi00NzFlLTlhOWQtODYyMDc2ZGJmYzFhXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg",
+        "Dangal": "https://m.media-amazon.com/images/M/MV5BMTQ4MzQzMzM2Nl5BMl5BanBnXkFtZTgwMTQ1NzU3MDI@._V1_SX300.jpg",
+        "Vikram": "https://m.media-amazon.com/images/M/MV5BYjFjMTQzY2EtZjQ5MC00NGUyLWJiYWMtZDI3MTQ1MGU4OGY2XkEyXkFqcGdeQXVyNDExMjcyMzA@._V1_SX300.jpg",
+        "Pushpa": "https://m.media-amazon.com/images/M/MV5BNGZlNTFlOWMtMzUwNC00ZDdhLWI4Y2UtYTY2ZDhmMGQ0OTc1XkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_SX300.jpg",
+        "Baahubali 2": "https://m.media-amazon.com/images/M/MV5BYTMxMGY2ZjQtYjdmOS00NzlkLWJiMjItZGM0MWY3MmQ1NjM2XkEyXkFqcGdeQXVyMzc5Mjk3OA@@._V1_SX300.jpg",
+        "Drishyam": "https://m.media-amazon.com/images/M/MV5BYjY2NGNmYjQtZjg5MC00NGVmLWJkZTgtMzQ3YzgyNTY2YTVkXkEyXkFqcGdeQXVyMjkxNzQ1NDI@._V1_SX300.jpg",
+        "Kantara": "https://m.media-amazon.com/images/M/MV5BM2Q3MWEwM2EtNzQwZC00YzE0LWJlYWYtMjk1ZjNlYWQ3ZTQyXkEyXkFqcGdeQXVyMTUzNTgzNzM0._V1_SX300.jpg",
+        "Arjun Reddy": "https://m.media-amazon.com/images/M/MV5BNzIwMzk1MjEtZGUxZi00YTMwLWFiYWMtZDI2Yjk0NzlmMmE2XkEyXkFqcGdeQXVyMzgxODM4NjM@._V1_SX300.jpg"
+    }
+    
+    # Check if we have a predefined poster
+    if movie_title in movie_posters:
+        return movie_posters[movie_title]
+    
+    # Fallback to a styled placeholder
+    return f"https://via.placeholder.com/300x450/667eea/ffffff?text={movie_title.replace(' ', '%20')}"
 
 def display_movie_card(movie: Dict):
     """Display a movie recommendation card with poster and clickable platform links"""
@@ -378,14 +397,21 @@ def display_movie_card(movie: Dict):
     
     with col1:
         # Display movie poster
-        st.markdown(f"""
-        <div style="text-align: center;">
-            <img src="{poster_url}" 
-                 style="width: 100%; max-width: 200px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);"
-                 alt="{movie['title']} Poster"
-                 onerror="this.src='https://via.placeholder.com/300x450/667eea/ffffff?text={movie['title'].replace(' ', '+')}'">
-        </div>
-        """, unsafe_allow_html=True)
+        try:
+            st.image(poster_url, width=200, caption=f"{movie['title']} ({movie['year']})")
+        except:
+            # Fallback if image fails to load
+            st.markdown(f"""
+            <div style="text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        color: white; padding: 2rem; border-radius: 10px; height: 300px; 
+                        display: flex; align-items: center; justify-content: center;">
+                <div>
+                    <h3>🎬</h3>
+                    <p>{movie['title']}</p>
+                    <p>({movie['year']})</p>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
     
     with col2:
         # Display movie details
