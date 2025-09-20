@@ -345,36 +345,71 @@ def main():
     # Header
     st.markdown('<h1 class="main-header">🎬 Movie Mood</h1>', unsafe_allow_html=True)
     
-    # Database status (hidden from user interface)
-    
     # Initialize recommender
     recommender = MovieRecommender()
     
-    # Search interface
-    st.markdown('<div class="search-container">', unsafe_allow_html=True)
-    st.markdown("### 🔍 What kind of movie are you in the mood for?")
+    # Browse by Categories Section
+    st.markdown("## 🎭 Browse by Categories")
+    
+    # Popular Genres Section
+    st.markdown("### 🎬 Popular Genres")
+    genre_cols = st.columns(5)
+    
+    query = ""
+    
+    with genre_cols[0]:
+        if st.button("🎬 Action", use_container_width=True):
+            query = "action movies"
+    with genre_cols[1]:
+        if st.button("😂 Comedy", use_container_width=True):
+            query = "comedy movies"
+    with genre_cols[2]:
+        if st.button("💔 Drama", use_container_width=True):
+            query = "drama movies"
+    with genre_cols[3]:
+        if st.button("❤️ Romance", use_container_width=True):
+            query = "romance movies"
+    with genre_cols[4]:
+        if st.button("🔥 Thriller", use_container_width=True):
+            query = "thriller movies"
+    
+    # Languages Section
+    st.markdown("### 🌍 Languages")
+    lang_cols = st.columns(5)
+    
+    with lang_cols[0]:
+        if st.button("🇮🇳 Hindi", use_container_width=True):
+            query = "hindi movies"
+    with lang_cols[1]:
+        if st.button("🎭 Tamil", use_container_width=True):
+            query = "tamil movies"
+    with lang_cols[2]:
+        if st.button("🎪 Telugu", use_container_width=True):
+            query = "telugu movies"
+    with lang_cols[3]:
+        if st.button("🌴 Malayalam", use_container_width=True):
+            query = "malayalam movies"
+    with lang_cols[4]:
+        if st.button("🎨 Kannada", use_container_width=True):
+            query = "kannada movies"
+    
+    st.markdown("---")
+    
+    # AI Search Section
+    st.markdown("## 🔍 Ask AI for Movie Recommendations")
+    st.markdown("### What kind of movies are you looking for?")
     
     # Search input
-    query = st.text_input(
+    search_query = st.text_input(
         "Search Movies",
         placeholder="e.g., 'Tamil action movies', 'Hindi comedy films', 'Malayalam thrillers', 'latest Bollywood'",
         key="movie_search",
         label_visibility="collapsed"
     )
     
-    # Quick filters
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        if st.button("🎬 Latest Blockbusters"):
-            query = "latest blockbuster movies 2023 2024"
-    with col2:
-        if st.button("😂 Comedy Movies"):
-            query = "comedy movies funny films"
-    with col3:
-        if st.button("🔥 Action Thrillers"):
-            query = "action thriller movies"
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Use search query if entered, otherwise use button query
+    if search_query:
+        query = search_query
     
     # Generate recommendations
     if query:
