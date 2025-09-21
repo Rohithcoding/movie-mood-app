@@ -616,6 +616,17 @@ def display_movie_card(movie: Dict):
     """, unsafe_allow_html=True)
 
 def main():
+    # Initialize recommender
+    recommender = MovieRecommender()
+    
+    # Initialize session state for results
+    if 'show_results' not in st.session_state:
+        st.session_state.show_results = False
+    if 'current_query' not in st.session_state:
+        st.session_state.current_query = ""
+    if 'last_recommendations' not in st.session_state:
+        st.session_state.last_recommendations = []
+    
     # Header - Always visible and prominent
     st.markdown("""
     <div style="text-align: center; margin: 2rem 0;">
@@ -629,168 +640,161 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Initialize recommender
-    recommender = MovieRecommender()
+    # Create containers for dynamic content
+    results_placeholder = st.empty()
     
-    # Browse by Categories Section
-    st.markdown("## 🎭 Browse by Categories")
-    
-    # Popular Genres Section
-    st.markdown("### 🎬 Popular Genres")
-    genre_cols = st.columns(5)
-    
-    query = ""
-    show_movies = False
-    
-    with genre_cols[0]:
-        if st.button("🎬 Action", use_container_width=True, key="action_btn"):
-            query = "action movies"
-            show_movies = True
-            st.session_state.selected_category = "Action Movies"
-    with genre_cols[1]:
-        if st.button("😂 Comedy", use_container_width=True, key="comedy_btn"):
-            query = "comedy movies"
-            show_movies = True
-            st.session_state.selected_category = "Comedy Movies"
-    with genre_cols[2]:
-        if st.button("💔 Drama", use_container_width=True, key="drama_btn"):
-            query = "drama movies"
-            show_movies = True
-            st.session_state.selected_category = "Drama Movies"
-    with genre_cols[3]:
-        if st.button("❤️ Romance", use_container_width=True, key="romance_btn"):
-            query = "romance movies"
-            show_movies = True
-            st.session_state.selected_category = "Romance Movies"
-    with genre_cols[4]:
-        if st.button("🔥 Thriller", use_container_width=True, key="thriller_btn"):
-            query = "thriller movies"
-            show_movies = True
-            st.session_state.selected_category = "Thriller Movies"
-    
-    # Languages Section
-    st.markdown("### 🌍 Languages")
-    lang_cols = st.columns(5)
-    
-    with lang_cols[0]:
-        if st.button("🇮🇳 Hindi", use_container_width=True, key="hindi_btn"):
-            query = "hindi movies"
-            show_movies = True
-            st.session_state.selected_category = "Hindi Movies"
-    with lang_cols[1]:
-        if st.button("🎭 Tamil", use_container_width=True, key="tamil_btn"):
-            query = "tamil movies"
-            show_movies = True
-            st.session_state.selected_category = "Tamil Movies"
-    with lang_cols[2]:
-        if st.button("🎪 Telugu", use_container_width=True, key="telugu_btn"):
-            query = "telugu movies"
-            show_movies = True
-            st.session_state.selected_category = "Telugu Movies"
-    with lang_cols[3]:
-        if st.button("🌴 Malayalam", use_container_width=True, key="malayalam_btn"):
-            query = "malayalam movies"
-            show_movies = True
-            st.session_state.selected_category = "Malayalam Movies"
-    with lang_cols[4]:
-        if st.button("🎨 Kannada", use_container_width=True, key="kannada_btn"):
-            query = "kannada movies"
-            show_movies = True
-            st.session_state.selected_category = "Kannada Movies"
-    
-    st.markdown("---")
-    
-    # AI Search Section
-    st.markdown('<div class="search-container">', unsafe_allow_html=True)
-    st.markdown("### 🔍 What kind of movies are you looking for?")
-    
-    # Search input
-    search_query = st.text_input(
-        "Search Movies",
-        placeholder="e.g., 'Tamil action movies', 'Hindi comedy films', 'Malayalam thrillers', 'latest Bollywood'",
-        key="movie_search",
-        label_visibility="collapsed"
-    )
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Use search query if entered, otherwise use button query
-    if search_query:
-        query = search_query
-        show_movies = True
-        st.session_state.selected_category = f"Search: {search_query}"
-    
-    # Initialize session state for results
-    if 'show_results' not in st.session_state:
-        st.session_state.show_results = False
-    if 'current_query' not in st.session_state:
-        st.session_state.current_query = ""
-    
-    # Generate recommendations immediately when button is clicked or search is entered
-    if query and show_movies:
-        st.session_state.show_results = True
-        st.session_state.current_query = query
-        
-        # Show category header with scroll indicator
-        category_name = st.session_state.get('selected_category', 'Movie Recommendations')
-        st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                    padding: 1rem 2rem; border-radius: 15px; margin: 2rem 0; 
-                    animation: slideIn 0.5s ease-out; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
-            <h2 style="color: white; margin: 0; text-align: center; font-size: 1.8rem;">
-                🎬 {category_name}
-            </h2>
-            <p style="color: rgba(255,255,255,0.9); text-align: center; margin: 0.5rem 0 0 0; font-size: 1rem;">
-                ⬇️ Your personalized movie recommendations are ready!
-            </p>
-        </div>
-        <style>
-        @keyframes slideIn {{
-            from {{ opacity: 0; transform: translateY(-20px); }}
-            to {{ opacity: 1; transform: translateY(0); }}
-        }}
-        </style>
-        """, unsafe_allow_html=True)
-        
-        with st.spinner("🎭 Finding perfect movies for you..."):
-            try:
-                recommendations = recommender.generate_ai_recommendations(query, 5)
-                
-                if recommendations:
-                    st.success(f"🎬 Found {len(recommendations)} amazing movies for you!")
-                    
-                    # Store recommendations in session state for persistence
-                    st.session_state.last_recommendations = recommendations
-                    
-                    for i, movie in enumerate(recommendations, 1):
-                        st.markdown(f"### {i}. {movie['title']} ({movie['year']})")
-                        display_movie_card(movie)
-                        
-                        if i < len(recommendations):
-                            st.markdown("---")
-                else:
-                    st.warning("🎭 No movies found. Try a different search!")
-                    
-            except Exception as e:
-                st.error(f"🎭 Oops! Something went wrong: {str(e)}")
-                st.info("💡 Try searching for something like 'action movies' or 'romantic comedies'")
-    
-    # Show persistent search results if they exist in session state
-    elif st.session_state.show_results and hasattr(st.session_state, 'last_recommendations') and st.session_state.last_recommendations:
-        category_name = st.session_state.get('selected_category', 'Previous Recommendations')
-        st.markdown(f"## 🎬 {category_name}")
-        
-        for i, movie in enumerate(st.session_state.last_recommendations, 1):
-            st.markdown(f"### {i}. {movie['title']} ({movie['year']})")
-            display_movie_card(movie)
+    # Check if we need to show results at the top
+    if st.session_state.show_results and st.session_state.last_recommendations:
+        with results_placeholder.container():
+            # Show results at the top
+            category_name = st.session_state.get('selected_category', 'Movie Recommendations')
+            st.markdown(f"""
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        padding: 1rem 2rem; border-radius: 15px; margin: 2rem 0; 
+                        animation: slideIn 0.5s ease-out; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+                <h2 style="color: white; margin: 0; text-align: center; font-size: 1.8rem;">
+                    🎬 {category_name}
+                </h2>
+                <p style="color: rgba(255,255,255,0.9); text-align: center; margin: 0.5rem 0 0 0; font-size: 1rem;">
+                    ✨ Your personalized movie recommendations!
+                </p>
+            </div>
+            <style>
+            @keyframes slideIn {{
+                from {{ opacity: 0; transform: translateY(-20px); }}
+                to {{ opacity: 1; transform: translateY(0); }}
+            }}
+            </style>
+            """, unsafe_allow_html=True)
             
-            if i < len(st.session_state.last_recommendations):
-                st.markdown("---")
+            st.success(f"🎬 Found {len(st.session_state.last_recommendations)} amazing movies for you!")
+            
+            for i, movie in enumerate(st.session_state.last_recommendations, 1):
+                st.markdown(f"### {i}. {movie['title']} ({movie['year']})")
+                display_movie_card(movie)
+                
+                if i < len(st.session_state.last_recommendations):
+                    st.markdown("---")
+            
+            # Add button to browse more categories
+            st.markdown("---")
+            if st.button("🔍 Browse More Categories", use_container_width=True, key="browse_more"):
+                st.session_state.show_results = False
+                st.rerun()
+    
+    # Show browse categories when no results or user wants to browse more
+    if not st.session_state.show_results:
+        # Browse by Categories Section
+        st.markdown("## 🎭 Browse by Categories")
+        
+        # Popular Genres Section
+        st.markdown("### 🎬 Popular Genres")
+        genre_cols = st.columns(5)
+        
+        query = ""
+        show_movies = False
+        
+        with genre_cols[0]:
+            if st.button("🎬 Action", use_container_width=True, key="action_btn"):
+                query = "action movies"
+                show_movies = True
+                st.session_state.selected_category = "Action Movies"
+        with genre_cols[1]:
+            if st.button("😂 Comedy", use_container_width=True, key="comedy_btn"):
+                query = "comedy movies"
+                show_movies = True
+                st.session_state.selected_category = "Comedy Movies"
+        with genre_cols[2]:
+            if st.button("💔 Drama", use_container_width=True, key="drama_btn"):
+                query = "drama movies"
+                show_movies = True
+                st.session_state.selected_category = "Drama Movies"
+        with genre_cols[3]:
+            if st.button("❤️ Romance", use_container_width=True, key="romance_btn"):
+                query = "romance movies"
+                show_movies = True
+                st.session_state.selected_category = "Romance Movies"
+        with genre_cols[4]:
+            if st.button("🔥 Thriller", use_container_width=True, key="thriller_btn"):
+                query = "thriller movies"
+                show_movies = True
+                st.session_state.selected_category = "Thriller Movies"
+        
+        # Languages Section
+        st.markdown("### 🌍 Languages")
+        lang_cols = st.columns(5)
+        
+        with lang_cols[0]:
+            if st.button("🇮🇳 Hindi", use_container_width=True, key="hindi_btn"):
+                query = "hindi movies"
+                show_movies = True
+                st.session_state.selected_category = "Hindi Movies"
+        with lang_cols[1]:
+            if st.button("🎭 Tamil", use_container_width=True, key="tamil_btn"):
+                query = "tamil movies"
+                show_movies = True
+                st.session_state.selected_category = "Tamil Movies"
+        with lang_cols[2]:
+            if st.button("🎪 Telugu", use_container_width=True, key="telugu_btn"):
+                query = "telugu movies"
+                show_movies = True
+                st.session_state.selected_category = "Telugu Movies"
+        with lang_cols[3]:
+            if st.button("🌴 Malayalam", use_container_width=True, key="malayalam_btn"):
+                query = "malayalam movies"
+                show_movies = True
+                st.session_state.selected_category = "Malayalam Movies"
+        with lang_cols[4]:
+            if st.button("🎨 Kannada", use_container_width=True, key="kannada_btn"):
+                query = "kannada movies"
+                show_movies = True
+                st.session_state.selected_category = "Kannada Movies"
+        
+        st.markdown("---")
+        
+        # AI Search Section
+        st.markdown('<div class="search-container">', unsafe_allow_html=True)
+        st.markdown("### 🔍 What kind of movies are you looking for?")
+        
+        # Search input
+        search_query = st.text_input(
+            "Search Movies",
+            placeholder="e.g., 'Tamil action movies', 'Hindi comedy films', 'Malayalam thrillers', 'latest Bollywood'",
+            key="movie_search",
+            label_visibility="collapsed"
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        # Use search query if entered, otherwise use button query
+        if search_query:
+            query = search_query
+            show_movies = True
+            st.session_state.selected_category = f"Search: {search_query}"
+        
+        # Generate recommendations immediately when button is clicked or search is entered
+        if query and show_movies:
+            with st.spinner("🎭 Finding perfect movies for you..."):
+                try:
+                    recommendations = recommender.generate_ai_recommendations(query, 5)
+                    
+                    if recommendations:
+                        # Store recommendations and show results
+                        st.session_state.last_recommendations = recommendations
+                        st.session_state.show_results = True
+                        st.session_state.current_query = query
+                        st.rerun()  # Rerun to show results at top
+                    else:
+                        st.warning("🎭 No movies found. Try a different search!")
+                        
+                except Exception as e:
+                    st.error(f"🎭 Oops! Something went wrong: {str(e)}")
+                    st.info("💡 Try searching for something like 'action movies' or 'romantic comedies'")
     
     # Footer
     st.markdown("---")
     st.markdown("""
     <div style="text-align: center; color: #666; margin: 2rem 0;">
-        <p>Movie Mood - Your AI-Powered Movie Companion</p>
+        <p>🎬 Movie Mood - Your AI-Powered Movie Companion</p>
     </div>
     """, unsafe_allow_html=True)
 
