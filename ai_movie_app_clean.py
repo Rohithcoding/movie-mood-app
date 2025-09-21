@@ -719,23 +719,37 @@ def main():
         show_movies = True
         st.session_state.selected_category = f"Search: {search_query}"
     
+    # Initialize session state for results
+    if 'show_results' not in st.session_state:
+        st.session_state.show_results = False
+    if 'current_query' not in st.session_state:
+        st.session_state.current_query = ""
+    
     # Generate recommendations immediately when button is clicked or search is entered
     if query and show_movies:
-        # Create anchor point for auto-scroll
-        st.markdown('<div id="movie-results"></div>', unsafe_allow_html=True)
+        st.session_state.show_results = True
+        st.session_state.current_query = query
         
-        # Auto-scroll to results
-        st.markdown("""
-        <script>
-        setTimeout(function() {
-            document.getElementById('movie-results').scrollIntoView({behavior: 'smooth'});
-        }, 100);
-        </script>
-        """, unsafe_allow_html=True)
-        
-        # Show category header
+        # Show category header with scroll indicator
         category_name = st.session_state.get('selected_category', 'Movie Recommendations')
-        st.markdown(f"## 🎬 {category_name}")
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                    padding: 1rem 2rem; border-radius: 15px; margin: 2rem 0; 
+                    animation: slideIn 0.5s ease-out; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+            <h2 style="color: white; margin: 0; text-align: center; font-size: 1.8rem;">
+                🎬 {category_name}
+            </h2>
+            <p style="color: rgba(255,255,255,0.9); text-align: center; margin: 0.5rem 0 0 0; font-size: 1rem;">
+                ⬇️ Your personalized movie recommendations are ready!
+            </p>
+        </div>
+        <style>
+        @keyframes slideIn {{
+            from {{ opacity: 0; transform: translateY(-20px); }}
+            to {{ opacity: 1; transform: translateY(0); }}
+        }}
+        </style>
+        """, unsafe_allow_html=True)
         
         with st.spinner("🎭 Finding perfect movies for you..."):
             try:
@@ -761,8 +775,9 @@ def main():
                 st.info("💡 Try searching for something like 'action movies' or 'romantic comedies'")
     
     # Show persistent search results if they exist in session state
-    elif hasattr(st.session_state, 'last_recommendations') and st.session_state.last_recommendations:
-        st.markdown(f"## 🎬 {st.session_state.get('selected_category', 'Previous Recommendations')}")
+    elif st.session_state.show_results and hasattr(st.session_state, 'last_recommendations') and st.session_state.last_recommendations:
+        category_name = st.session_state.get('selected_category', 'Previous Recommendations')
+        st.markdown(f"## 🎬 {category_name}")
         
         for i, movie in enumerate(st.session_state.last_recommendations, 1):
             st.markdown(f"### {i}. {movie['title']} ({movie['year']})")
