@@ -207,21 +207,6 @@ st.markdown("""
         font-weight: 500 !important;
     }
     
-    /* Results Section Styling */
-    #results-section {
-        scroll-margin-top: 2rem;
-    }
-    
-    /* Movie Container Styling */
-    .stContainer {
-        margin-bottom: 2rem;
-    }
-    
-    /* Smooth scrolling for the entire page */
-    html {
-        scroll-behavior: smooth;
-    }
-    
     /* Remove Streamlit Branding */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
@@ -655,32 +640,32 @@ def main():
     genre_cols = st.columns(5)
     
     query = ""
-    show_results = False
+    show_movies = False
     
     with genre_cols[0]:
         if st.button("🎬 Action", use_container_width=True, key="action_btn"):
             query = "action movies"
-            show_results = True
+            show_movies = True
             st.session_state.selected_category = "Action Movies"
     with genre_cols[1]:
         if st.button("😂 Comedy", use_container_width=True, key="comedy_btn"):
             query = "comedy movies"
-            show_results = True
+            show_movies = True
             st.session_state.selected_category = "Comedy Movies"
     with genre_cols[2]:
         if st.button("💔 Drama", use_container_width=True, key="drama_btn"):
             query = "drama movies"
-            show_results = True
+            show_movies = True
             st.session_state.selected_category = "Drama Movies"
     with genre_cols[3]:
         if st.button("❤️ Romance", use_container_width=True, key="romance_btn"):
             query = "romance movies"
-            show_results = True
+            show_movies = True
             st.session_state.selected_category = "Romance Movies"
     with genre_cols[4]:
         if st.button("🔥 Thriller", use_container_width=True, key="thriller_btn"):
             query = "thriller movies"
-            show_results = True
+            show_movies = True
             st.session_state.selected_category = "Thriller Movies"
     
     # Languages Section
@@ -690,27 +675,27 @@ def main():
     with lang_cols[0]:
         if st.button("🇮🇳 Hindi", use_container_width=True, key="hindi_btn"):
             query = "hindi movies"
-            show_results = True
+            show_movies = True
             st.session_state.selected_category = "Hindi Movies"
     with lang_cols[1]:
         if st.button("🎭 Tamil", use_container_width=True, key="tamil_btn"):
             query = "tamil movies"
-            show_results = True
+            show_movies = True
             st.session_state.selected_category = "Tamil Movies"
     with lang_cols[2]:
         if st.button("🎪 Telugu", use_container_width=True, key="telugu_btn"):
             query = "telugu movies"
-            show_results = True
+            show_movies = True
             st.session_state.selected_category = "Telugu Movies"
     with lang_cols[3]:
         if st.button("🌴 Malayalam", use_container_width=True, key="malayalam_btn"):
             query = "malayalam movies"
-            show_results = True
+            show_movies = True
             st.session_state.selected_category = "Malayalam Movies"
     with lang_cols[4]:
         if st.button("🎨 Kannada", use_container_width=True, key="kannada_btn"):
             query = "kannada movies"
-            show_results = True
+            show_movies = True
             st.session_state.selected_category = "Kannada Movies"
     
     st.markdown("---")
@@ -731,57 +716,66 @@ def main():
     # Use search query if entered, otherwise use button query
     if search_query:
         query = search_query
-        show_results = True
-        st.session_state.selected_category = "Search Results"
+        show_movies = True
+        st.session_state.selected_category = f"Search: {search_query}"
     
-    # Show results immediately when button is clicked or search is entered
-    if show_results or query:
-        # Add scroll anchor
-        st.markdown('<div id="results-section"></div>', unsafe_allow_html=True)
+    # Generate recommendations immediately when button is clicked or search is entered
+    if query and show_movies:
+        # Create anchor point for auto-scroll
+        st.markdown('<div id="movie-results"></div>', unsafe_allow_html=True)
         
-        # Add smooth scroll to results
+        # Auto-scroll to results
         st.markdown("""
         <script>
         setTimeout(function() {
-            document.getElementById('results-section').scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
+            document.getElementById('movie-results').scrollIntoView({behavior: 'smooth'});
         }, 100);
         </script>
         """, unsafe_allow_html=True)
         
         # Show category header
         category_name = st.session_state.get('selected_category', 'Movie Recommendations')
-        st.markdown(f"## {category_name}")
+        st.markdown(f"## 🎬 {category_name}")
         
-        with st.spinner("Finding perfect movies for you..."):
+        with st.spinner("🎭 Finding perfect movies for you..."):
             try:
-                recommendations = recommender.generate_ai_recommendations(query, 6)
+                recommendations = recommender.generate_ai_recommendations(query, 5)
                 
                 if recommendations:
-                    st.success(f"Found {len(recommendations)} amazing movies for you!")
+                    st.success(f"🎬 Found {len(recommendations)} amazing movies for you!")
                     
-                    # Display movies in a more organized way
+                    # Store recommendations in session state for persistence
+                    st.session_state.last_recommendations = recommendations
+                    
                     for i, movie in enumerate(recommendations, 1):
-                        with st.container():
-                            st.markdown(f"### {i}. {movie['title']}")
-                            display_movie_card(movie)
-                            
-                            if i < len(recommendations):
-                                st.markdown("---")
+                        st.markdown(f"### {i}. {movie['title']} ({movie['year']})")
+                        display_movie_card(movie)
+                        
+                        if i < len(recommendations):
+                            st.markdown("---")
                 else:
-                    st.warning("No movies found. Try a different search!")
+                    st.warning("🎭 No movies found. Try a different search!")
                     
             except Exception as e:
-                st.error(f"Oops! Something went wrong: {str(e)}")
-                st.info("Try searching for something like 'action movies' or 'romantic comedies'")
+                st.error(f"🎭 Oops! Something went wrong: {str(e)}")
+                st.info("💡 Try searching for something like 'action movies' or 'romantic comedies'")
+    
+    # Show persistent search results if they exist in session state
+    elif hasattr(st.session_state, 'last_recommendations') and st.session_state.last_recommendations:
+        st.markdown(f"## 🎬 {st.session_state.get('selected_category', 'Previous Recommendations')}")
+        
+        for i, movie in enumerate(st.session_state.last_recommendations, 1):
+            st.markdown(f"### {i}. {movie['title']} ({movie['year']})")
+            display_movie_card(movie)
+            
+            if i < len(st.session_state.last_recommendations):
+                st.markdown("---")
     
     # Footer
     st.markdown("---")
     st.markdown("""
     <div style="text-align: center; color: #666; margin: 2rem 0;">
-        <p> Movie Mood - Your AI-Powered Movie Companion</p>
+        <p>Movie Mood - Your AI-Powered Movie Companion</p>
     </div>
     """, unsafe_allow_html=True)
 
